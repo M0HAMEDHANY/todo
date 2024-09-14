@@ -1,2 +1,2 @@
 # todo
- full stack web app using react and django
+  Full Stack Web app using react and django
