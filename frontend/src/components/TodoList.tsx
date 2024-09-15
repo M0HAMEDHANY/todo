@@ -1,11 +1,13 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Plus, X, Check, Edit2 } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card } from "@/components/ui/card"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
+import { log } from 'console'
+import { data } from 'framer-motion/client'
 
 type Task = {
     id: number
@@ -22,6 +24,20 @@ export function TodoList({ darkMode }: TodoListProps) {
     const [newTask, setNewTask] = useState('')
     const [editingTask, setEditingTask] = useState<Task | null>(null)
     const [editedTaskText, setEditedTaskText] = useState('')
+
+
+    useEffect(() => {
+        getTasks()
+    }, [])
+
+    const getTasks = async () => { 
+        const response = await fetch('http://127.0.0.1:8000/api/todo/')
+        const data = await response.json()
+        setTasks(data)
+        console.log(data)
+    }
+
+
 
     const addTask = () => {
         if (newTask.trim() !== '') {
