@@ -72,7 +72,7 @@ function NavbarContent({ darkMode, setDarkMode, user, onLogout, onLoginClick, on
             </div>
             {user ? (
                 <>
-                    <span className="text-sm md:text-base">Welcome, {user.username}!</span>
+                    <span className="text-lg md:text-base text-center">Welcome, {user.username}!</span>
                     <Button onClick={onLogout} variant="outline" size="sm">Logout</Button>
                 </>
             ) : (
