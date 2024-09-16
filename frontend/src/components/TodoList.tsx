@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Plus, X, Edit2, ChevronDown, ChevronUp } from 'lucide-react'
+import { Plus, X, Edit2, ChevronDown, ChevronUp, ClipboardList } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card } from "@/components/ui/card"
@@ -12,7 +12,7 @@ type Task = {
     id: number
     text: string
     completed: boolean
-    created: string // New field for creation date
+    created: string
 }
 
 type TodoListProps = {
@@ -26,13 +26,36 @@ export function TodoList({ darkMode }: TodoListProps) {
     const [editedTaskText, setEditedTaskText] = useState('')
 
     useEffect(() => {
-        getTasks()
+        if (!localStorage.getItem('accessToken')) {
+            fetchCsrfToken();
+        }
+        getTasks();
     }, [])
 
-    const getTasks = async () => {
-        const response = await fetch('http://127.0.0.1:8000/api/todo/')
+    const fetchCsrfToken = async () => {
+        const response = await fetch('http://127.0.0.1:8000/api/csrf-token/', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        })
         const data = await response.json()
-        setTasks(data)
+        localStorage.setItem('accessToken', data.csrfToken)
+    }
+
+    const getTasks = async () => {
+        const response = await fetch('http://127.0.0.1:8000/api/todo/', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        })
+        if (response.ok) {
+            const data = await response.json();
+            setTasks(data);
+        } else {
+            console.error('Failed to fetch todos');
+        }
     }
 
     const addTask = async () => {
@@ -113,18 +136,25 @@ export function TodoList({ darkMode }: TodoListProps) {
                 />
                 <Button onClick={addTask} className="w-full sm:w-auto"><Plus className="h-4 w-4 mr-2" /> Add Task</Button>
             </div>
-            <div className="space-y-2">
-                {tasks.map((task) => (
-                    <TaskCard
-                        key={task.id}
-                        task={task}
-                        darkMode={darkMode}
-                        onToggle={() => toggleTask(task.id)}
-                        onEdit={() => startEditingTask(task)}
-                        onDelete={() => deleteTask(task.id)}
-                    />
-                ))}
-            </div>
+            {tasks.length === 0 ? (
+                <div className="text-center">
+                    <ClipboardList className="w-24 h-24 mx-auto mb-4 text-gray-400" />
+                    <p className="text-xl font-semibold">No tasks yet. Add one to get started!</p>
+                </div>
+            ) : (
+                <div className="space-y-2">
+                    {tasks.map((task) => (
+                        <TaskCard
+                            key={task.id}
+                            task={task}
+                            darkMode={darkMode}
+                            onToggle={() => toggleTask(task.id)}
+                            onEdit={() => startEditingTask(task)}
+                            onDelete={() => deleteTask(task.id)}
+                        />
+                    ))}
+                </div>
+            )}
 
             <Dialog open={editingTask !== null} onOpenChange={() => setEditingTask(null)}>
                 <DialogContent className={darkMode ? 'dark:bg-gray-800 dark:text-white' : ''}>
