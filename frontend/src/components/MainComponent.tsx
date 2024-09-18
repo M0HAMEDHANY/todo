@@ -15,17 +15,24 @@ type User = {
 
 type AlertType = 'success' | 'info' | 'warning' | 'error'
 
-export default function CircularTodoList() {
-    const [darkMode, setDarkMode] = useState(false)
+export default function MainComponent() {
     const [user, setUser] = useState<User | null>(null)
     const [authMode, setAuthMode] = useState<'login' | 'signup'>('login')
     const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
     const [alert, setAlert] = useState<{ type: AlertType; message: string } | null>(null)
     const [loading, setLoading] = useState(false)
     const [progress, setProgress] = useState(0)
-    const API_URL = 'http://localhost:8000/auth/';
-    
+    const API_URL = 'http://localhost:8000/';
+    const [darkMode, setDarkMode] = useState(() => {
+        if (typeof window !== 'undefined') {
+            const savedMode = localStorage.getItem('darkMode')
+            return savedMode ? JSON.parse(savedMode) : false
+        }
+        return false
+    })
+
     useEffect(() => {
+        // Apply dark mode class on initial load
         if (darkMode) {
             document.documentElement.classList.add('dark')
         } else {
@@ -36,27 +43,40 @@ export default function CircularTodoList() {
         if (storedUser) {
             setUser(JSON.parse(storedUser))
         }
+    }, [])
+
+    useEffect(() => {
+        // Update localStorage and apply/remove class when darkMode changes
+        localStorage.setItem('darkMode', JSON.stringify(darkMode))
+        if (darkMode) {
+            document.documentElement.classList.add('dark')
+        } else {
+            document.documentElement.classList.remove('dark')
+        }
     }, [darkMode])
+
+    const toggleDarkMode = (value: boolean) => {
+        setDarkMode(value)
+    }
     
     const register = async (username: string, password: string) => {
         try {
-            const response = await axios.post(`${API_URL}signup/`, { username, password });
+            const response = await axios.post(`${API_URL}auth/register/`, { username, password });
             return response.data;
         } catch (error) {
             return { error: 'An error occurred during signup' };
         }
     };
     
-    
     const login = async (username: string, password: string) => {
         try {
-            const response = await axios.post(`${API_URL}login/`, { username, password });
+            const response = await axios.post(`${API_URL}auth/login/`, { username, password });
             return response.data;
         } catch (error) {
             return { error: 'An error occurred during login' };
         }
     };
-
+    
     const handleLogin = async (username: string, password: string) => {
         setLoading(true)
         setProgress(0)
@@ -70,6 +90,7 @@ export default function CircularTodoList() {
                 const userData = { username, password }
                 setUser(userData)
                 localStorage.setItem('user', JSON.stringify(userData))
+                localStorage.setItem('accessToken', response.access)
                 setAlert({ type: 'success', message: 'Login successful!' })
                 setProgress(100)
             }
@@ -79,7 +100,7 @@ export default function CircularTodoList() {
             setLoading(false)
         }
     }
-
+    
     const handleSignup = async (username: string, password: string) => {
         setLoading(true)
         setProgress(0)
@@ -93,6 +114,7 @@ export default function CircularTodoList() {
                 const userData = { username, password }
                 setUser(userData)
                 localStorage.setItem('user', JSON.stringify(userData))
+                localStorage.setItem('accessToken', response.access)
                 setAlert({ type: 'success', message: 'Signup successful!' })
                 setProgress(100)
             }
@@ -102,10 +124,11 @@ export default function CircularTodoList() {
             setLoading(false)
         }
     }
-
+    
     const handleLogout = () => {
         setUser(null)
         localStorage.removeItem('user')
+        localStorage.removeItem('accessToken')
         setAlert({ type: 'info', message: 'You have been logged out' })
     }
 
@@ -113,7 +136,7 @@ export default function CircularTodoList() {
         <div className="min-h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-white transition-colors duration-300">
             <Navbar
                 darkMode={darkMode}
-                setDarkMode={setDarkMode}
+                setDarkMode={toggleDarkMode}
                 user={user}
                 onLogout={handleLogout}
                 onLoginClick={() => { setAuthMode('login'); setIsAuthModalOpen(true) }}

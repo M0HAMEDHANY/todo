@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input"
 import { Card } from "@/components/ui/card"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 import { Checkbox } from "@/components/ui/checkbox"
+import axios from 'axios'
 
 type Task = {
     id: number
@@ -19,6 +20,8 @@ type TodoListProps = {
     darkMode: boolean
 }
 
+const API_URL = 'http://localhost:8000/api/';
+
 export function TodoList({ darkMode }: TodoListProps) {
     const [tasks, setTasks] = useState<Task[]>([])
     const [newTask, setNewTask] = useState('')
@@ -26,81 +29,99 @@ export function TodoList({ darkMode }: TodoListProps) {
     const [editedTaskText, setEditedTaskText] = useState('')
 
     useEffect(() => {
-        if (!localStorage.getItem('accessToken')) {
-            fetchCsrfToken();
-        }
         getTasks();
     }, [])
 
-    const fetchCsrfToken = async () => {
-        const response = await fetch('http://127.0.0.1:8000/api/csrf-token/', {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-        })
-        const data = await response.json()
-        localStorage.setItem('accessToken', data.csrfToken)
-    }
-
     const getTasks = async () => {
-        const response = await fetch('http://127.0.0.1:8000/api/todo/', {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-        })
-        if (response.ok) {
-            const data = await response.json();
-            setTasks(data);
-        } else {
-            console.error('Failed to fetch todos');
+        try {
+            const token = localStorage.getItem('accessToken');
+            if (!token) {
+                console.error('No access token found');
+                return;
+            }
+
+            const response = await axios.get(`${API_URL}todo/`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                },
+            });
+
+            setTasks(response.data);
+        } catch (error) {
+            console.error('An error occurred while fetching todos:', error);
         }
-    }
+    };
 
     const addTask = async () => {
         if (newTask.trim() !== '') {
-            const response = await fetch('http://127.0.0.1:8000/api/todo/', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ text: newTask })
-            })
-            const data = await response.json()
-            setTasks([...tasks, data])
-            setNewTask('')
+            try {
+                const token = localStorage.getItem('accessToken');
+                if (!token) {
+                    console.error('No access token found');
+                    return;
+                }
+                const response = await axios.post(`${API_URL}todo/`,
+                    { text: newTask },
+                    {
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                        },
+                    }
+                );
+
+                setTasks([...tasks, response.data]);
+                setNewTask('');
+            } catch (error) {
+                console.error('Failed to add task:', error);
+            }
         }
     }
 
     const toggleTask = async (id: number) => {
-        const task = tasks.find(task => task.id === id)
+        const task = tasks.find(task => task.id === id);
         if (task) {
-            const response = await fetch(`http://127.0.0.1:8000/api/todo/${id}/`, {
-                method: 'PATCH',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ completed: !task.completed })
-            })
-            const data = await response.json()
-            setTasks(tasks.map(task =>
-                task.id === id ? data : task
-            ))
+            try {
+                const token = localStorage.getItem('accessToken');
+                if (!token) {
+                    console.error('No access token found');
+                    return;
+                }
+                const response = await axios.patch(`${API_URL}todo/${id}/`,
+                    { completed: !task.completed },
+                    {
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        },
+                    }
+                );
+                setTasks(tasks.map(task =>
+                    task.id === id ? response.data : task
+                ));
+            } catch (error) {
+                console.error('Failed to toggle task:', error);
+            }
         }
-    }
+    };
 
     const deleteTask = async (id: number) => {
-        const response = await fetch(`http://127.0.0.1:8000/api/todo/${id}/`, {
-            method: 'DELETE',
-            headers: {
-                'Content-Type': 'application/json',
+        try {
+            const token = localStorage.getItem('accessToken');
+            if (!token) {
+                console.error('No access token found');
+                return;
             }
-        })
-        if (response.ok) {
-            setTasks(tasks.filter(task => task.id !== id))
+
+            await axios.delete(`${API_URL}todo/${id}/`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            setTasks(tasks.filter(task => task.id !== id));
+        } catch (error) {
+            console.error('Failed to delete task:', error);
         }
-    }
+    };
 
     const startEditingTask = (task: Task) => {
         setEditingTask(task)
@@ -109,21 +130,32 @@ export function TodoList({ darkMode }: TodoListProps) {
 
     const saveEditedTask = async () => {
         if (editingTask && editedTaskText.trim() !== '' && editingTask.text !== editedTaskText.trim()) {
-            const response = await fetch(`http://127.0.0.1:8000/api/todo/${editingTask.id}/`, {
-                method: 'PATCH',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ text: editedTaskText.trim() })
-            });
-            const data = await response.json();
-            setTasks(tasks.map(task =>
-                task.id === editingTask.id ? data : task
-            ));
-            setEditingTask(null);
+            try {
+                const token = localStorage.getItem('accessToken');
+                if (!token) {
+                    console.error('No access token found');
+                    return;
+                }
+
+                const response = await axios.patch(`${API_URL}todo/${editingTask.id}/`,
+                    { text: editedTaskText.trim() },
+                    {
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    }
+                );
+
+                setTasks(tasks.map(task =>
+                    task.id === editingTask.id ? response.data : task
+                ));
+                setEditingTask(null);
+                setEditedTaskText('');
+            } catch (error) {
+                console.error('Failed to save edited task:', error);
+            }
         }
     };
-
     return (
         <div className="w-full max-w-3xl mx-auto">
             <div className="mb-4 flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">

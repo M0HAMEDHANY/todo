@@ -1,8 +1,8 @@
-import CircularTodoList from "./components/CircularTodoList"
+import MainComponent from "./components/MainComponent"
 
 function App() {
   return (
-    <CircularTodoList />
+    <MainComponent />
   )
 }
 
