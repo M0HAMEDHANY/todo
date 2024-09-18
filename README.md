@@ -8,9 +8,6 @@ Welcome to the Todo List Application! This project is a full-stack web applicati
   - ![signupview](https://github.com/user-attachments/assets/83e31dca-23ea-4e85-9f30-8557d5337ea2)
 - **Login**: Existing users can log in to access their personal task list.
   - ![loginview jpeg](https://github.com/user-attachments/assets/fa45a82d-6f0c-43cf-b6b1-4e0fd8a7924d)
-- **Responsive Design**: The application is fully responsive and works seamlessly on various devices.
-  - ![mobile](https://github.com/user-attachments/assets/aefa40bd-72d8-4696-9d70-66a2604069cc)
-  - ![tablet](https://github.com/user-attachments/assets/506e881f-81be-49a2-b00c-312612f89ed0)
 - **Dark Mode**: Users can switch between light and dark mode for a better viewing experience.
   - ![darkmode](https://github.com/user-attachments/assets/d7b0b86c-a76e-4b14-878f-c75c38fb454a)
   - ![lightmode](https://github.com/user-attachments/assets/3da5b452-5447-44b5-9560-7cfd3e21c106)
@@ -18,6 +15,9 @@ Welcome to the Todo List Application! This project is a full-stack web applicati
   - ![authentcationstatussuccess](https://github.com/user-attachments/assets/77f457f2-1620-44b1-ac42-27d77be95cec)
   - ![authentcationstatuslougout](https://github.com/user-attachments/assets/a2c26366-b04c-49dc-9caf-70c3c6da7a0d)
   - ![eachuserhasitsowntasks](https://github.com/user-attachments/assets/4de1404d-9624-4928-bf98-9682b76de275)
+- **Responsive Design**: The application is fully responsive and works seamlessly on various devices.
+  - ![mobile](https://github.com/user-attachments/assets/aefa40bd-72d8-4696-9d70-66a2604069cc)
+  - ![tablet](https://github.com/user-attachments/assets/506e881f-81be-49a2-b00c-312612f89ed0)
 - **Mode Persistence**: Dark/light mode preference is saved in `localStorage`.
 - **CRUD Operations**: Users can Create, Read, Update, and Delete their tasks.
 - **Session Management**: User sessions are saved in `localStorage` for persistent login.
