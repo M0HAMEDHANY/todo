@@ -46,8 +46,8 @@ Welcome to the Todo List Application! This project is a full-stack web applicati
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/todo-list-app.git
-   cd todo-list-app/frontend
+   git clone https://git@github.com:M0HAMEDHANY/todo.git
+   cd todo/frontend
    ```
 
 2. Install dependencies:
