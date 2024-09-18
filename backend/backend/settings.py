@@ -76,8 +76,12 @@ WSGI_APPLICATION = "backend.wsgi.application"
 
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": "",  # The name of the PostgreSQL database
+        "USER": "",  # The PostgreSQL user you created
+        "PASSWORD": "",  # The password you set for the PostgreSQL user
+        "HOST": "localhost",  
+        "PORT": "5432",  
     }
 }
 

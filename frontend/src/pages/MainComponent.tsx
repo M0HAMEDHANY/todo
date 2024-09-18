@@ -1,12 +1,13 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Navbar } from './Navbar'
-import { AuthModal } from './AuthModal'
-import { TodoList } from './TodoList'
-import { AlertComponent } from './Alert'
+import { Navbar } from '../components/Navbar'
+import { AuthModal } from '../components/AuthModal'
+import { TodoList } from '../components/TodoList'
+import { AlertComponent } from '../components/Alert'
 import { ListTodo } from 'lucide-react'
 import axios from 'axios';
+
 
 type User = {
     username: string
@@ -32,7 +33,6 @@ export default function MainComponent() {
     })
 
     useEffect(() => {
-        // Apply dark mode class on initial load
         if (darkMode) {
             document.documentElement.classList.add('dark')
         } else {
@@ -46,7 +46,6 @@ export default function MainComponent() {
     }, [])
 
     useEffect(() => {
-        // Update localStorage and apply/remove class when darkMode changes
         localStorage.setItem('darkMode', JSON.stringify(darkMode))
         if (darkMode) {
             document.documentElement.classList.add('dark')
@@ -58,25 +57,31 @@ export default function MainComponent() {
     const toggleDarkMode = (value: boolean) => {
         setDarkMode(value)
     }
-    
+
     const register = async (username: string, password: string) => {
         try {
             const response = await axios.post(`${API_URL}auth/register/`, { username, password });
             return response.data;
         } catch (error) {
+            if ((error as any).response && (error as any).response.status === 400) {
+                return { error: 'User already exists' };
+            }
             return { error: 'An error occurred during signup' };
         }
     };
-    
+
     const login = async (username: string, password: string) => {
         try {
             const response = await axios.post(`${API_URL}auth/login/`, { username, password });
             return response.data;
         } catch (error) {
+            if ((error as any).response.status === 401) {
+                return { error: 'Invalid username or password' };
+            }
             return { error: 'An error occurred during login' };
         }
     };
-    
+
     const handleLogin = async (username: string, password: string) => {
         setLoading(true)
         setProgress(0)
@@ -100,7 +105,7 @@ export default function MainComponent() {
             setLoading(false)
         }
     }
-    
+
     const handleSignup = async (username: string, password: string) => {
         setLoading(true)
         setProgress(0)
@@ -124,7 +129,7 @@ export default function MainComponent() {
             setLoading(false)
         }
     }
-    
+
     const handleLogout = () => {
         setUser(null)
         localStorage.removeItem('user')

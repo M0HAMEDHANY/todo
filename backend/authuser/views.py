@@ -23,7 +23,6 @@ def signup(request: HttpRequest) -> HttpResponse:
 
 @api_view(["POST"])
 def login(request):
-    print(request.data)  # Debugging line
     username = request.data.get("username")
     password = request.data.get("password")
     user = authenticate(username=username, password=password)
