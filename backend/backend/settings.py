@@ -39,7 +39,7 @@ REST_FRAMEWORK = {
 }
 
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60),  # Increased from 5 to 60 minutes
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=600), 
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
 }
 
@@ -77,11 +77,11 @@ WSGI_APPLICATION = "backend.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": "",  # The name of the PostgreSQL database
-        "USER": "",  # The PostgreSQL user you created
-        "PASSWORD": "",  # The password you set for the PostgreSQL user
-        "HOST": "localhost",  
-        "PORT": "5432",  
+        "NAME": "todo_list",  # The name of the PostgreSQL database
+        "USER": "verceldb",  # The PostgreSQL user you created
+        "PASSWORD": "ivMXNGTFcj35",  # The password you set for the PostgreSQL user
+        "HOST": "localhost",
+        "PORT": "5432",
     }
 }
 
@@ -111,6 +111,3 @@ USE_TZ = True
 STATIC_URL = "static/"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
-
-CSRF_TRUSTED_ORIGINS = ["http://127.0.0.1:8000", "http://localhost:8000"]
-CSRF_COOKIE_HTTPONLY = False
